@@ -6,7 +6,45 @@ solidity-parser-antlr
 
 A Solidity parser built on top of a robust [ANTLR4 grammar](https://github.com/solidityj/solidity-antlr4).
 
-### Usage
+### Use locally
+
+#### Requirements
+
+- `git`
+- `node`
+- `yarn`
+- `antlr4`
+
+#### 1. Prepare
+
+```shell
+git clone https://github.com/gihyeonsung/solidity-parser-antlr.git \
+  && (cd solidity-parser-antlr && yarn)
+```
+
+#### 2. Use
+
+
+1. Add deps
+
+```shell
+mkdir test \
+  && (cd test \
+  && yarn add file:../solidity-parser-antlr)
+```
+
+3. Set `type: module` in `package.js`
+
+```json
+{
+  "dependencies": {
+    "solidity-parser-antlr": "file:../solidity-parser-antlr"
+  },
+  "type": "module"
+}
+```
+
+3. Import `solidity-parser-antlr` in your source code
 
 ```javascript
 import parser from 'solidity-parser-antlr';
@@ -23,6 +61,27 @@ try {
     if (e instanceof parser.ParserError) {
         console.log(e.errors)
     }
+}
+```
+
+### Usage
+
+```javascript
+import parser from 'solidity-parser-antlr';
+
+var input = `
+    contract test {
+        uint256 a;
+        function f() {}
+    }
+`
+try {
+  const ast = parser.parse(input)
+  console.log(ast)
+} catch (e) {
+  if (e instanceof parser.ParserError) {
+    console.log(e.errors)
+  }
 }
 ```
 
