@@ -1,5 +1,4 @@
 const antlr4 = require('./antlr4/index')
-const parseComments = require('./natspec')
 
 function toText(ctx) {
   if (ctx !== null) {
@@ -117,22 +116,13 @@ const transformAST = {
 
   ContractDefinition(ctx) {
     const name = toText(ctx.identifier())
-    let natspec = null
-    let kind
-    if (ctx.natSpec()) {
-      natspec = parseComments(toText(ctx.getChild(0)))
-      kind = toText(ctx.getChild(1))
-    } else {
-      kind = toText(ctx.getChild(0))
-    }
     this._currentContract = name
 
     return {
-      natspec,
       name,
       baseContracts: this.visit(ctx.inheritanceSpecifier()),
       subNodes: this.visit(ctx.contractPart()),
-      kind
+      kind: toText(ctx.getChild(0))
     }
   },
 
@@ -225,13 +215,7 @@ const transformAST = {
       stateMutability = toText(ctx.modifierList().stateMutability(0))
     }
 
-    let natspec = null
-    if (ctx.natSpec()) {
-      natspec = parseComments(toText(ctx.getChild(0)))
-    }
-
     return {
-      natspec,
       name,
       parameters,
       returnParameters,
@@ -261,13 +245,9 @@ const transformAST = {
     }
   },
 
-  TypeNameExpression(ctx) {
-    let typeName = ctx.elementaryTypeName()
-    if (typeName === null) {
-      typeName = ctx.userDefinedTypeName()
-    }
+  ElementaryTypeNameExpression(ctx) {
     return {
-      typeName: this.visit(typeName)
+      typeName: this.visit(ctx.elementaryTypeName())
     }
   },
 
@@ -280,7 +260,7 @@ const transformAST = {
 
       return {
         type: 'ArrayTypeName',
-        baseTypeName: this.visit(ctx.typeName()),
+        baseTypeName: this.visit(ctx.getChild(0)),
         length
       }
     }
@@ -772,24 +752,16 @@ const transformAST = {
           type: 'UserDefinedTypeName',
           namePath: node.name
         }
-      } else if (node.type == 'TypeNameExpression') {
-        node = node.typeName
       } else {
         node = {
           type: 'ElementaryTypeName',
           name: toText(ctx.getChild(0))
         }
       }
-
-      const typeName = {
+      return {
         type: 'ArrayTypeName',
         baseTypeName: node,
         length: null
-      }
-
-      return {
-        type: 'TypeNameExpression',
-        typeName
       }
     }
 
@@ -918,12 +890,7 @@ const transformAST = {
   },
 
   EventDefinition(ctx) {
-    let natspec = null
-    if (ctx.natSpec()) {
-      natspec = parseComments(toText(ctx.getChild(0)))
-    }
     return {
-      natspec,
       name: toText(ctx.identifier()),
       parameters: this.visit(ctx.eventParameterList()),
       isAnonymous: !!ctx.AnonymousKeyword()

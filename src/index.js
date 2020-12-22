@@ -24,7 +24,7 @@ ParserError.prototype.name = 'ParserError'
 function tokenize(input, options) {
   options = options || {}
 
-  const chars = new antlr4.InputStream(input)
+  const chars = antlr4.CharStreams.fromString(input)
   const lexer = new SolidityLexer(chars)
   const tokens = new antlr4.CommonTokenStream(lexer)
 
@@ -34,7 +34,7 @@ function tokenize(input, options) {
 function parse(input, options) {
   options = options || {}
 
-  const chars = new antlr4.InputStream(input)
+  const chars = antlr4.CharStreams.fromString(input)
 
   const listener = new ErrorListener()
 
@@ -78,10 +78,7 @@ function parse(input, options) {
 }
 
 function _isASTNode(node) {
-  return (
-    !!node && typeof node === 'object'
-    && Object.prototype.hasOwnProperty.call(node, 'type')
-  )
+  return !!node && typeof node === 'object' && node.hasOwnProperty('type')
 }
 
 function visit(node, visitor) {

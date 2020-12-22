@@ -72,12 +72,11 @@ export type ASTNodeTypeString =
   | 'AssemblyLiteral'
   | 'SubAssembly'
   | 'TupleExpression'
-  | 'TypeNameExpression'
+  | 'ElementaryTypeNameExpression'
   | 'BooleanLiteral'
   | 'NumberLiteral'
   | 'Identifier'
   | 'BinaryOperation'
-  | 'UnaryOperation'
   | 'Conditional'
   | 'StringLiteral'
   | 'HexLiteral'
@@ -322,9 +321,9 @@ export interface TupleExpression extends BaseASTNode {
   components: Expression[];
   isArray: boolean;
 }
-export interface TypeNameExpression extends BaseASTNode {
-  type: 'TypeNameExpression';
-  typeName: ElementaryTypeName | UserDefinedTypeName;
+export interface ElementaryTypeNameExpression extends BaseASTNode {
+  type: 'ElementaryTypeNameExpression';
+  typeName: ElementaryTypeName;
 }
 export interface NumberLiteral extends BaseASTNode {
   type: 'NumberLiteral';
@@ -389,25 +388,11 @@ export type BinOp =
   | '*='
   | '/='
   | '%=';
-export type UnaryOp =
-  | '-'
-  | '+'
-  | '++'
-  | '~'
-  | 'after'
-  | 'delete'
-  | '!';
 export interface BinaryOperation extends BaseASTNode {
   type: 'BinaryOperation';
   left: Expression;
   right: Expression;
   operator: BinOp;
-}
-export interface UnaryOperation extends BaseASTNode {
-  type: 'UnaryOperation';
-  operator: UnaryOp;
-  subExpression: Expression;
-  isPrefix: boolean;
 }
 export interface Conditional extends BaseASTNode {
   type: 'Conditional';
@@ -481,7 +466,7 @@ export type ASTNode =
   | AssemblyLiteral
   | SubAssembly
   | TupleExpression
-  | TypeNameExpression
+  | ElementaryTypeNameExpression
   | BinaryOperation
   | Conditional
   | IndexAccess
@@ -517,14 +502,13 @@ export type Expression =
   | Conditional
   | MemberAccess
   | FunctionCall
-  | UnaryOperation
   | PrimaryExpression;
 export type PrimaryExpression =
   | BooleanLiteral
   | NumberLiteral
   | Identifier
   | TupleExpression
-  | TypeNameExpression;
+  | ElementaryTypeNameExpression;
 export type SimpleStatement =
   | VariableDeclarationStatement
   | ExpressionStatement;
@@ -597,7 +581,7 @@ export interface Visitor {
   AssemblyLiteral?: (node: AssemblyLiteral) => any;
   SubAssembly?: (node: SubAssembly) => any;
   TupleExpression?: (node: TupleExpression) => any;
-  TypeNameExpression?: (node: TypeNameExpression) => any;
+  ElementaryTypeNameExpression?: (node: ElementaryTypeNameExpression) => any;
   NumberLiteral?: (node: NumberLiteral) => any;
   BooleanLiteral?: (node: BooleanLiteral) => any;
   Identifier?: (node: Identifier) => any;
@@ -660,8 +644,8 @@ export interface Visitor {
   'AssemblyLiteral:exit'?: (node: AssemblyLiteral) => any;
   'SubAssembly:exit'?: (node: SubAssembly) => any;
   'TupleExpression:exit'?: (node: TupleExpression) => any;
-  'TypeNameExpression:exit'?: (
-    node: TypeNameExpression
+  'ElementaryTypeNameExpression:exit'?: (
+    node: ElementaryTypeNameExpression
   ) => any;
   'NumberLiteral:exit'?: (node: NumberLiteral) => any;
   'BooleanLiteral:exit'?: (node: BooleanLiteral) => any;
